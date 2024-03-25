@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clo835
+data:
+  BACKGROUND_IMAGE: "BUCKET NAME"
+  GROUP_NAME: "Group1"
