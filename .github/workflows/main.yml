@@ -49,8 +49,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: docker-assignment
           IMAGE_TAG: v0.1
-          DATABASE_ECR_PREFIX: database-image
-          APPLICATION_ECR_PREFIX: app-image
+          DATABASE_ECR_PREFIX: database-final
+          APPLICATION_ECR_PREFIX: app-final
           PASSWORD: password123
         run: |
           cd web_application/
