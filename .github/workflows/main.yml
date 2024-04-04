@@ -47,10 +47,10 @@ jobs:
       - name: BUILD->TEST->PUSH
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: docker-assignment
+          ECR_REPOSITORY: final-project
           IMAGE_TAG: v0.1
-          DATABASE_ECR_PREFIX: database-final
-          APPLICATION_ECR_PREFIX: app-final
+          DATABASE_ECR_PREFIX: database
+          APPLICATION_ECR_PREFIX: app
           PASSWORD: password123
         run: |
           cd web_application/
