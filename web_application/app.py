@@ -1,58 +1,55 @@
 from flask import Flask, render_template, request
 from pymysql import connections
 import os
-import random
-import argparse
 import boto3
-
-
 
 app = Flask(__name__)
 
+# Environment variables
 DBHOST = os.environ.get("DBHOST", "localhost")
 DBUSER = os.environ.get("DBUSER", "root")
-DBPWD = os.environ.get("DBPWD", "password") 
+DBPWD = os.environ.get("DBPWD", "password")
 DATABASE = os.environ.get("DATABASE", "employees")
-DBPORT = int(os.environ.get("DBPORT", 3306)) 
+DBPORT = int(os.environ.get("DBPORT", 3306))
 bucketname = os.environ.get("bucketname", "clo835group1")
-bgimage = os.environ.get("backgroundimage", "project1.jpg")
-groupName = os.environ.get("groupName", "Group-1")
+imageName = os.environ.get("backgroundimage", "background.png")
+groupName = os.environ.get("groupName", "Group1")
 
-
-# Create a connection to the MySQL database
+# Database connection
 db_conn = connections.Connection(
-    host= DBHOST,
+    host=DBHOST,
     port=DBPORT,
-    user= DBUSER,
-    password= DBPWD, 
-    db= DATABASE
-    
+    user=DBUSER,
+    password=DBPWD,
+    db=DATABASE
 )
-output = {}
-table = 'employee';
 
-s3_client = boto3.client('s3')
-
-imagesDir = "static" 
-
+# S3 Client- To download the Image
+s3_client = boto3.client('s3', region_name='us-east-1') 
+imagesDir = "static"
 if not os.path.exists(imagesDir):
     os.makedirs(imagesDir)
 
-def download(bucket=bucketname, imageName=bgimage):
+def download(bucket=bucketname, imageName=imageName):
     bgImagePath = os.path.join(imagesDir, imageName)
     try:
         s3_client.download_file(bucket, imageName, bgImagePath)
-        print(f"Successfully downloaded {imageName} from bucket {bucket} to {bgImagePath}")
-        return os.path.join("/", imagesDir, imageName)
+        log_msg = f"Successfully downloaded {imageName} from bucket {bucket} to {bgImagePath}"
+        print(log_msg)
+        return f"/static/{imageName}"
     except Exception as e:
-        print(f"Exception occurred while fetching the image from S3: {e}")
+        print(f"Exception occurred: {e}")
         return None
-       
+
+
+image_url = download()
+print(f"Background image URL: {image_url}")  
+
 @app.route("/", methods=['GET', 'POST'])
 def home():
     return render_template('addemp.html', image=image_url, group_name=groupName)
 
-@app.route("/about", methods=['GET','POST'])
+@app.route("/about", methods=['GET', 'POST'])
 def about():
     return render_template('about.html', image=image_url, group_name=groupName)
     
@@ -113,6 +110,4 @@ def FetchData():
                            lname=output["last_name"], interest=output["primary_skills"], location=output["location"], image=image_url, group_name=groupName)
 
 if __name__ == '__main__':
-    bgimage_url = download()  
-    print(bgimage_url)
     app.run(host='0.0.0.0', port=81, debug=True)
