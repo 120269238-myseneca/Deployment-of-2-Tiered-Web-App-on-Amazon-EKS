@@ -16,14 +16,14 @@ jobs:
       - name: Check Approver
         id: check_approval
         run: |
-          APPROVER="${{ github.event.inputs.approver }}"
-          if [ "$APPROVER" == "120269238-myseneca" ] || [ "$APPROVER" == "127895233-myseneca" ]|| [ "$APPROVER" == "revati310" ]; then
-            echo "Deployment approved by $APPROVER"
+          if [ "${{ github.event.inputs.approver }}" == "120269238-myseneca" ]; then
+            echo "Deployment approved by ${{ github.event.inputs.approver }}"
             echo "approved=true" >> $GITHUB_OUTPUT
           else
-            echo "Deployment not approved by $APPROVER"
+            echo "Deployment not approved by ${{ github.event.inputs.approver }}"
             echo "approved=false" >> $GITHUB_OUTPUT
           fi
+
   terraform_ecr:
     name: Terraform ECR
     needs: confirm
@@ -43,30 +43,26 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: BUILD->TEST->PUSH
+
+      - name: Build and Push Application IMAGE TO ECR
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_REGION: us-east-1
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: final-project
+          ECR_REPOSITORY: docker-assignment
           IMAGE_TAG: v0.1
-          DATABASE_ECR_PREFIX: database
-          APPLICATION_ECR_PREFIX: app
-          PASSWORD: password123
+          APPLICATION_ECR_PREFIX: app-image
+        run: |
+          cd web_application/
+          docker build -t $ECR_REGISTRY/${APPLICATION_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          docker push $ECR_REGISTRY/${APPLICATION_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG
+
+
+      - name: Build and Push DATABASE IMAGE TO ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: docker-assignment
+          IMAGE_TAG: v0.1
+          DATABASE_ECR_PREFIX: database-image
         run: |
           cd web_application/
           docker build -t $ECR_REGISTRY/${DATABASE_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql .
-          docker build -t $ECR_REGISTRY/${APPLICATION_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
-          docker run -d -e MYSQL_ROOT_PASSWORD=$PASSWORD --name mysql $ECR_REGISTRY/${DATABASE_ECR_PREFIX}-${ECR_REPOSITORY}:${IMAGE_TAG} 
-          docker ps
-          sleep 10
-      
-          docker run -d -p 81:81 -e DBHOST="172.17.0.2" -e DBPWD=$PASSWORD $ECR_REGISTRY/${APPLICATION_ECR_PREFIX}-${ECR_REPOSITORY}:${IMAGE_TAG}
-          docker ps
-          sleep 10
-          curl localhost:81 -vvv 
-
           docker push $ECR_REGISTRY/${DATABASE_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/${APPLICATION_ECR_PREFIX}-$ECR_REPOSITORY:$IMAGE_TAG
