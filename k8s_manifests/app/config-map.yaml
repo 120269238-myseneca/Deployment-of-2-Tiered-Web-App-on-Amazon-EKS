@@ -1,7 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: clo835
+  name: appconfigmap
 data:
-  BACKGROUND_IMAGE: "BUCKET NAME"
-  GROUP_NAME: "Group1"
+  DBPORT: "3306"
+  DBHOST: "mysql.final.svc.cluster.local"
+  backgroundimage: "background2.jpg"
+  bucketname: "clo835group1"
+  groupName: "BESTGROUP1"
