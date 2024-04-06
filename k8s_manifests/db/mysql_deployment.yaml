@@ -8,7 +8,6 @@ spec:
   selector:
     matchLabels:
       app: mysql
-
   template:
     metadata:
       labels:
@@ -16,7 +15,7 @@ spec:
     spec:
       containers:
         - name: database-container
-          image: .dkr.ecr.us-east-1.amazonaws.com/database-image-docker-assignment:v0.1
+          image: 494992235231.dkr.ecr.us-east-1.amazonaws.com/database-image-docker-assignment:v0.1
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -27,18 +26,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: dbsecrets
-                  key: MYSQL_DATABASE         
-            
-          # env:
-          #   - name: MYSQL_ROOT_PASSWORD
-          #     value: password1234
-          #   - name: MYSQL_DATABASE
-          #     value: employees
+                  key: MYSQL_DATABASE    
           ports:
             - containerPort: 3306
           volumeMounts:
             - name: mysql-data
-              mountPath: /data
+              mountPath: /var/lib/mysql
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
