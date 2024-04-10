@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: application-container
-          image: 494992235231.dkr.ecr.us-east-1.amazonaws.com/app-image-docker-assignment:v0.1
+          image: 494992235231.dkr.ecr.us-east-1.amazonaws.com/app-final-project:v0.1
           imagePullPolicy: Always
           env:
           - name: DBHOST
