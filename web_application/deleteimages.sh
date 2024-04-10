@@ -6,5 +6,3 @@ docker rmi application:v0.1 database:v0.1
 docker network rm group1Bridge
 #wrostcase if need remove another unusiamge
 # docker image prune -a -f
-# Use these when having storage issue
-#docker volume prune

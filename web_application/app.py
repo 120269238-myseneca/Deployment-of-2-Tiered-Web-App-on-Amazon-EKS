@@ -12,8 +12,8 @@ DBPWD = os.environ.get("DBPWD", "password")
 DATABASE = os.environ.get("DATABASE", "employees")
 DBPORT = int(os.environ.get("DBPORT", 3306))
 bucketname = os.environ.get("bucketname", "clo835group1")
-imageName = os.environ.get("backgroundimage", "background.png")
-groupName = os.environ.get("groupName", "Group1")
+bgimage = os.environ.get("backgroundimage", "background.png")
+groupName = os.environ.get("groupName", "Group-1")
 
 # Database connection
 db_conn = connections.Connection(
@@ -24,21 +24,23 @@ db_conn = connections.Connection(
     db=DATABASE
 )
 
-# S3 Client- To download the Image
+# S3 Client
 s3_client = boto3.client('s3', region_name='us-east-1') 
+# Directory for storing images
 imagesDir = "static"
 if not os.path.exists(imagesDir):
     os.makedirs(imagesDir)
 
-def download(bucket=bucketname, imageName=imageName):
+def download(bucket=bucketname, imageName=bgimage):
     bgImagePath = os.path.join(imagesDir, imageName)
     try:
         s3_client.download_file(bucket, imageName, bgImagePath)
         log_msg = f"Successfully downloaded {imageName} from bucket {bucket} to {bgImagePath}"
         print(log_msg)
+        # Assuming your static directory is directly accessible via the web server:
         return f"/static/{imageName}"
     except Exception as e:
-        print(f"Exception occurred: {e}")
+        print(f"Exception occurred while fetching the image from S3: {e}")
         return None
 
 
