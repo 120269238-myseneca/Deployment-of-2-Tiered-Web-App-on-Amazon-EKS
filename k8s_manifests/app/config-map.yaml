@@ -5,6 +5,6 @@ metadata:
 data:
   DBPORT: "3306"
   DBHOST: "mysql.final.svc.cluster.local"
-  backgroundimage: "background2.jpg"
+  backgroundimage: "photo1.png"
   bucketname: "clo835group1"
-  groupName: "BESTGROUP1"
+  groupName: "BESTGROUP"
